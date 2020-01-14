@@ -19,6 +19,6 @@ Flutter Project (tested on android emulator)
 
 # Screenshots
 
-<img src="https://raw.githubusercontent.com/Goolpe/scoreboard_service/master/assets/0.png" width="200" />
-<img src="https://raw.githubusercontent.com/Goolpe/scoreboard_service/master/assets/1.png" width="200" />
-<img src="https://raw.githubusercontent.com/Goolpe/scoreboard_service/master/assets/2.png" width="200" />
+<img src="https://raw.githubusercontent.com/Goolpe/scoreboard_service/master/assets/0.png" width="200" /> |
+<img src="https://raw.githubusercontent.com/Goolpe/scoreboard_service/master/assets/1.png" width="200" /> |
+<img src="https://raw.githubusercontent.com/Goolpe/scoreboard_service/master/assets/2.png" width="200" /> |
