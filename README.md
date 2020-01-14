@@ -6,6 +6,6 @@ Flutter Project (tested on android)
 - sorting scores
 - removing scores
 
-<img src="https://github.com/Goolpe/scoreboard_service/tree/master/assets/0.png" width="200" /> |
-<img src="https://github.com/Goolpe/scoreboard_service/tree/master/assets/1.png" width="200" /> |
-<img src="https://github.com/Goolpe/scoreboard_service/tree/master/assets/2.png" width="200" /> |
+<img src="https://raw.githubusercontent.com/Goolpe/scoreboard_service/master/assets/0.png" width="200" /> |
+<img src="https://raw.githubusercontent.com/Goolpe/scoreboard_service/master/assets/1.png" width="200" /> |
+<img src="https://raw.githubusercontent.com/Goolpe/scoreboard_service/master/assets/2.png" width="200" /> |
