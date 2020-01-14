@@ -28,7 +28,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>{
               const Text('Tervetuloa!', style: TextStyle(fontSize:30)),
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 16),
-                child: const Text('Please, input your name')
+                child: const Text('Please, enter your name')
               ),
               Row(
                 children: <Widget>[
@@ -38,7 +38,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>{
                       child: TextFormField(
                         validator: (String data) {
                           if(data.isEmpty) 
-                            return 'Input the name';
+                            return 'Enter name';
                           else 
                             return null;
                         },
