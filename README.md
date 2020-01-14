@@ -9,13 +9,13 @@ Flutter Project (tested on android emulator)
 
 # How to create and install
 
-1. git clone https://github.com/Goolpe/scoreboard_service.git
-2. flutter pub get
+1. ```git clone https://github.com/Goolpe/scoreboard_service.git```
+2. ```flutter pub get```
 3. if you haven't key run ```keytool -genkey -v -keystore c:/Users/USER_NAME/key.jks -storetype JKS -keyalg RSA -keysize 
 2048 -validity 10000 -alias key``` (change USER_NAME)
 4. update android/key.properties
-5. flutter build apk --split-per-abi
-6. flutter install
+5. ```flutter build apk --split-per-abi```
+6. ```flutter install```
 
 # Screenshots
 
