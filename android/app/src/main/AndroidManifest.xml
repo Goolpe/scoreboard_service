@@ -8,7 +8,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="scoreboard_service"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@drawable/ic_app">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

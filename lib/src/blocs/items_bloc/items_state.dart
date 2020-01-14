@@ -11,8 +11,6 @@ abstract class ItemsState extends Equatable{
 
 class ItemsUninitialize extends ItemsState{}
 
-class ItemsLoading extends ItemsState{}
-
 class ItemsEmpty extends ItemsState{}
 
 class ItemsExist extends ItemsState{

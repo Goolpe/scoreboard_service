@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen>{
                         elevation: 10,
                         margin: const EdgeInsets.only(top: 24),
                         child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 10),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
