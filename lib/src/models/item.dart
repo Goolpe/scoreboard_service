@@ -6,25 +6,26 @@ import 'package:sqflite/sqflite.dart';
 class Item extends Equatable {
   const Item({
     this.id,
-    @required this.name,
+    @required this.description,
     @required this.score
   });
 
   final int id;
-  final String name;
+  final String description;
   final int score;
 
   @override
-  List<Object> get props => [id,name,score];
+  List<Object> get props => <Object>[id,description,score];
 
-  static Future<void> persist(Item data) async {
+  static Future<void> persist(Item data, String userName) async {
     final Database db = await DBProvider().database;
 
     await db.rawInsert(
-      'INSERT Into Item (name,score) VALUES (?,?)',
+      'INSERT Into Item (description,score,userName) VALUES (?,?,?)',
       <dynamic>[
-        data.name, 
-        data.score
+        data.description, 
+        data.score,
+        userName
       ]
     );
   }
@@ -32,18 +33,14 @@ class Item extends Equatable {
   static Future<void> remove(int itemID) async {
     final Database db = await DBProvider().database;
 
-    await db.rawDelete(
-      'DELETE FROM Item WHERE id = ?',
-      <int>[
-        itemID
-      ]
-    );
+    await db.rawDelete('DELETE FROM Item WHERE id = ?', <int>[itemID]);
   }
 
-  static Future<List<Item>> getAll() async {
+  static Future<List<Item>> getAll(String userName) async {
     final Database db = await DBProvider().database;
-    
-    final List<Map<String, dynamic>> sqlData = await db.rawQuery('SELECT * FROM Item');
+
+    final List<Map<String, dynamic>> sqlData = await db.rawQuery(
+      'SELECT * FROM Item WHERE userName = ?', <String>[userName]);
 
     return sqlData.isEmpty 
       ? <Item>[]
@@ -54,7 +51,7 @@ class Item extends Equatable {
   static Item convert(Map<String, dynamic> data){
     return Item(
       id: data['id'] ?? 0,
-      name: data['name'] ?? '',
+      description: data['description'] ?? '',
       score: data['score'] ?? 0
     );
   }

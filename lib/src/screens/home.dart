@@ -1,168 +1,175 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:scoreboard_service/shelf.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class HomeScreen extends StatelessWidget{
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _scoreController = TextEditingController();
-  final FocusNode _nameFocus = FocusNode(); 
-  final FocusNode _scoreFocus = FocusNode(); 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+class HomeScreen extends StatefulWidget{
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>{
+
+  final PanelController _pc = PanelController();
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
-        body: Column(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: ListTile(
-                title: Text('Player'),
-                trailing: Text('Score'),
-              ),
-            ),
-            Expanded(
-              child: BlocBuilder<ItemBloc, ItemState>(
-                builder: (BuildContext context, ItemState state){
-                  if(state is ItemExist){
-                    _nameController.clear();
-                    _scoreController.clear();
-                    
-                    return ListView.builder(
-                      itemCount: state.items.length,
-                      itemBuilder: (BuildContext context, int i){
-                        return Column(
-                          children: <Widget>[
-                            Slidable(
-                              actionPane: SlidableDrawerActionPane(),
-                              child: ListTile(
-                                title: Text(state.items[i].name),
-                                trailing: Text(state.items[i].score.toString()),
+        body: BlocProvider<ItemsBloc>(
+          create: (BuildContext context) =>
+            ItemsBloc()..add(ItemsStarted()),
+          child: BlocBuilder<ItemsBloc, ItemsState>(
+            builder: (BuildContext context, ItemsState state){
+
+              if(state is ItemsUninitialize){
+                return const SizedBox();
+              }
+
+              return PanelComponent(
+                controller: _pc,
+                child: state is ItemsExist
+                  ? Column(
+                    children: <Widget>[
+                      Card(
+                        elevation: 10,
+                        margin: const EdgeInsets.only(top: 24),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text('${state.userName}', 
+                                      style: TextStyle(
+                                        fontSize: 18, 
+                                        fontWeight: FontWeight.bold
+                                      )
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.exit_to_app),
+                                      onPressed: () => _logOut(),
+                                    )
+                                  ]
+                                )
                               ),
-                              secondaryActions: <Widget>[
-                                IconSlideAction(
-                                  caption: 'Delete',
-                                  color: Colors.red,
-                                  icon: Icons.delete,
-                                  onTap: () => BlocProvider.of<ItemBloc>(context).add(ItemRemove(state.items[i].id)),
+                              MaterialButton(
+                                child: Row(
+                                  children: <Widget>[
+                                    Text('SCORE (${state.amount})', 
+                                      style: TextStyle(
+                                        fontSize: 14, 
+                                        fontWeight: FontWeight.bold
+                                      )
+                                    ),
+                                    state.sort == 'scoreUp' 
+                                    ? Icon(Icons.arrow_drop_down)
+                                    : state.sort == 'scoreDown' 
+                                      ? Icon(Icons.arrow_drop_up)
+                                      : const SizedBox(),
+                                  ],
                                 ),
-                              ],
+                                onPressed: (){
+                                  BlocProvider.of<ItemsBloc>(context).add(
+                                    ItemsSort(state.sort == 'scoreUp' ? 'scoreDown' : 'scoreUp')
+                                  );
+                                },
+                              )
+                            ],
+                          )
+                        )
+                      ),
+                      Expanded(
+                        child: ListView.separated(
+                          physics: const BouncingScrollPhysics(),
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.all(0),
+                          separatorBuilder: (BuildContext context, int i) => 
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 12),
+                              child: const Divider(height: 1)
                             ),
-                            i == state.items.length - 1
-                            ? _inputPlayer(context)
-                            : const SizedBox()
-                          ]
-                        );
-                      },
-                    );
-                  } else{
-                    return Align(
-                      alignment: Alignment.topCenter,
-                      child: _inputPlayer(context)
-                    );
-                  }
-                }
-              )
-            )
-          ]
-        )
-      )
-    );
-  }
-
-  Widget _inputPlayer(BuildContext context){
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 12),
-      child: Form(
-        key: _formKey,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              flex: 2,
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 4),
-                child: TextFormField(
-                  validator: (String data) {
-                    if(data.isEmpty)
-                      return 'Input the name';
-                    else 
-                      return null;
-                  },
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Name',
-                    counter: SizedBox()
-                  ),
-                  textCapitalization: TextCapitalization.sentences,
-                  textInputAction: TextInputAction.next,
-                  focusNode: _nameFocus,
-                  onFieldSubmitted: (_){
-                    _nameFocus.unfocus();
-                    FocusScope.of(context).requestFocus(_scoreFocus);
-                  },
-                  maxLength: 50,
+                          itemCount: state.items.length,
+                          itemBuilder: (BuildContext context, int i){
+                            return Column(
+                              children: <Widget>[
+                                Slidable(
+                                  actionPane: const SlidableDrawerActionPane(),
+                                  child: ListTile(
+                                    title: Text('${state.items[i].description}'),
+                                    trailing: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius: const BorderRadius.all(Radius.circular(16)),
+                                      ),
+                                      child: Text(state.items[i].score.toString(), 
+                                        style: const TextStyle(
+                                          color: Colors.white
+                                        )
+                                      ),
+                                    ),
+                                  ),
+                                  secondaryActions: <Widget>[
+                                    IconSlideAction(
+                                      caption: 'Delete',
+                                      color: Colors.red,
+                                      icon: Icons.delete,
+                                      onTap: () => BlocProvider.of<ItemsBloc>(context).add(ItemsRemove(state.items[i].id)),
+                                    ),
+                                  ],
+                                ),
+                                i == state.items.length - 1
+                                ? _openPanel(context)
+                                : const SizedBox()
+                              ]
+                            );
+                          },
+                        )
+                      )
+                    ]
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      _openPanel(context),
+                      FlatButton(
+                        child: const Text('Log Out'),
+                        onPressed: () => _logOut(),
+                      )
+                    ]
                 ),
-              )
-            ),
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 4),
-                child: TextFormField(
-                  validator: (String data) {
-                    if(data.isEmpty)
-                      return 'Input the score';
-                    else 
-                      return null;
-                  },
-                  focusNode: _scoreFocus,
-                  controller: _scoreController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Score',
-                    counter: SizedBox()
-                  ),
-                  inputFormatters: <TextInputFormatter>[
-                    WhitelistingTextInputFormatter.digitsOnly
-                  ],
-                  keyboardType: TextInputType.number,
-                  onFieldSubmitted: (_){
-                    _scoreFocus.unfocus();
-                    _addPlayer(context);
-                  },
-                  maxLength: 10,
-                )
-              )
-            ),
-            // Expanded(
-            //   child: Container(
-            //     height: 70,
-            //     margin: EdgeInsets.symmetric(horizontal: 4),
-            //     child: RaisedButton(
-            //       child: Text('Add'),
-            //       onPressed: () => _addPlayer(context),
-            //     ),
-            //   )
-            // )
-          ]
-        )
-      )
-    );
-  }
-
-  void _addPlayer(BuildContext context){
-    if(_formKey.currentState.validate())
-      BlocProvider.of<ItemBloc>(context).add(
-        ItemAdd(
-          Item(
-            name: _nameController.text,
-            score: int.parse(_scoreController.text)
+              );
+            }
           )
         )
-      );
+      )
+    );
+  }
+  
+  Widget _openPanel(BuildContext context){
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      margin: const EdgeInsets.all(10),
+      height: 50,
+      child: RaisedButton.icon(
+        color: Theme.of(context).primaryColor,
+        textColor: Theme.of(context).buttonColor,
+        icon: Icon(Icons.add),
+        label: const Text('Add new score'),
+        onPressed: () => _pc.open(),
+      )
+    );
+  }
+
+  void _logOut(){
+    BlocProvider.of<AuthenticationBloc>(context).add(LoggedOut());
   }
 }

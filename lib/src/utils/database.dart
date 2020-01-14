@@ -11,8 +11,9 @@ class DBProvider {
       onCreate: (Database db, int version) async {
         await db.execute(r'''CREATE TABLE Item (
           id INTEGER PRIMARY KEY,
-          name TEXT,
-          score INTEGER
+          description TEXT,
+          score INTEGER,
+          userName TEXT
           )''');
       }
     );

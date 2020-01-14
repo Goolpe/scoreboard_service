@@ -16,9 +16,9 @@ void main() {
   runApp(
     MultiBlocProvider(
       providers: <BlocProvider<Bloc<dynamic, dynamic>>>[
-        BlocProvider<ItemBloc>(
+        BlocProvider<AuthenticationBloc>(
           create: (BuildContext context) =>
-           ItemBloc()..add(ItemLoad()),
+            AuthenticationBloc()..add(AppStarted()),
         ),
       ],
       child: App()
@@ -36,7 +36,14 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreen(),
+      home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+        builder: (BuildContext context, AuthenticationState authenticationState) =>
+          authenticationState is AuthenticationUninitialized
+          ? const Scaffold()
+          : authenticationState is AuthenticationAuthenticated
+          ? HomeScreen()
+          : WelcomeScreen()
+      )
     );
   }
 }
