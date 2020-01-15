@@ -27,51 +27,67 @@ class ItemsBloc extends Bloc<ItemsEvent, ItemsState>{
   }
 
   Stream<ItemsState> _mapStartedItemsToState() async*{
-    userName = await getUserName();
+    try{
+      userName = await getUserName();
 
-    add(ItemsLoad());
+      add(ItemsLoad());
+    } catch(error){
+      ItemsFailure(error);
+    }
   }
 
   Stream<ItemsState> _mapLoadItemsToState() async*{
-    final List<Item> items = List<Item>.from(
-      await Item.getAll(userName)
-    );
+    try{
+      final List<Item> items = List<Item>.from(
+        await Item.getAll(userName)
+      );
 
-    if(itemsLength != items.length){
-      itemsLength = items.length;
-      amount = 0;
-      for(Item item in items){
-        amount += item.score;
+      if(itemsLength != items.length){
+        itemsLength = items.length;
+        amount = 0;
+        for(Item item in items){
+          amount += item.score;
+        }
       }
+
+      items.sort((Item a, Item b){
+        switch(sort){
+          case 'scoreUp': return a.score.compareTo(b.score);
+          case 'scoreDown': return b.score.compareTo(a.score);
+          default: return a.score.compareTo(b.score);
+        }
+      });
+
+      yield items.isEmpty
+      ? ItemsEmpty()
+      : ItemsExist(
+        items: items, 
+        sort: sort,
+        amount: amount,
+        userName: userName
+      );
+    } catch(error){
+      ItemsFailure(error);
     }
-
-    items.sort((Item a, Item b){
-      switch(sort){
-        case 'scoreUp': return a.score.compareTo(b.score);
-        case 'scoreDown': return b.score.compareTo(a.score);
-        default: return a.score.compareTo(b.score);
-      }
-    });
-
-    yield items.isEmpty
-    ? ItemsEmpty()
-    : ItemsExist(
-      items: items, 
-      sort: sort,
-      amount: amount,
-      userName: userName
-    );
   }
 
   Stream<ItemsState> _mapAddItemsToState(ItemsAdd event) async*{
-    await Item.persist(event.item, userName);
+    try{
+      await Item.persist(event.item, userName);
 
-    add(ItemsLoad());
+      add(ItemsLoad());
+    } catch(error){
+      ItemsFailure(error);
+    }
   }
 
   Stream<ItemsState> _mapRemoveItemsToState(ItemsRemove event) async*{
-    await Item.remove(event.itemID);
-    add(ItemsLoad());
+    try{
+      await Item.remove(event.itemID);
+      add(ItemsLoad());
+    } catch(error){
+      ItemsFailure(error);
+    }
   }
 
   Stream<ItemsState> _mapSortItemsToState(ItemsSort event) async*{

@@ -1,3 +1,8 @@
+# 1.1.1
+
+- error handling
+- failure state for items
+
 # 1.1.0
 
 - refactoring, update design

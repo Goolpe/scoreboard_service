@@ -32,3 +32,15 @@ class ItemsExist extends ItemsState{
   @override
   String toString() => 'ItemsExist { items: $items, sort: $sort, amount:$amount, userName:$userName }';
 }
+
+class ItemsFailure extends ItemsState {
+  const ItemsFailure(this.error);
+
+  final dynamic error;
+
+  @override
+  List<Object> get props => <Object>[error];
+
+  @override
+  String toString() => 'ItemsFailure { error: $error }';
+}
